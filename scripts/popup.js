@@ -40,7 +40,6 @@ let currentStyle = {
     textAlign: 'center'
 };
 
-// 初始化事件监听
 document.addEventListener('DOMContentLoaded', () => {
     // 文本输入监听
     quoteText.addEventListener('input', () => {
@@ -48,6 +47,51 @@ document.addEventListener('DOMContentLoaded', () => {
         wordCount.textContent = `${length}/200`;
         generateBtn.disabled = length === 0;
     });
+
+    // 调用DeepSeek R1 API进行文本总结
+    async function summarizeText() {
+        const text = quoteText.value.trim();
+        if (!text) {
+            alert('请先输入需要总结的文字内容');
+            return;
+        }
+
+        summarizeBtn.disabled = true;
+        summarizeBtn.classList.add('loading');
+
+        try {
+            const response = await fetch('http://localhost:3000/summarize', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text })
+            });
+
+            if (!response.ok) {
+                throw new Error('网络请求失败');
+            }
+
+            const data = await response.json();
+            if (data.summary) {
+                quoteText.value = data.summary;
+                const length = quoteText.value.length;
+                wordCount.textContent = `${length}/200`;
+                generateBtn.disabled = length === 0;
+            } else {
+                throw new Error('获取总结失败');
+            }
+        } catch (error) {
+            console.error('总结失败:', error);
+            alert('总结失败，请稍后重试');
+        } finally {
+            summarizeBtn.disabled = false;
+            summarizeBtn.classList.remove('loading');
+        }
+    }
+
+    // 总结按钮事件
+    summarizeBtn.addEventListener('click', summarizeText);
 
     // 样式按钮点击事件
     document.querySelectorAll('.style-btn').forEach(btn => {
