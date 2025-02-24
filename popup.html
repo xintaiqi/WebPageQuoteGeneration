@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网页金句卡片生成器</title>
+    <link rel="stylesheet" href="styles/popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="input-section">
+            <textarea id="quoteText" placeholder="请输入或粘贴文字（最多200字）" maxlength="200"></textarea>
+            <div class="word-count">0/200</div>
+        </div>
+
+        <div class="style-section">
+            <div class="style-group">
+                <label>卡片样式</label>
+                <div class="style-options">
+                    <button class="style-btn active" data-style="simple">简约白</button>
+                    <button class="style-btn" data-style="warm">暖色调</button>
+                    <button class="style-btn" data-style="dark">深色系</button>
+                </div>
+            </div>
+
+            <div class="style-group">
+                <label>字体选择</label>
+                <select id="fontFamily">
+                    <option value="SimSun">宋体</option>
+                    <option value="Microsoft YaHei">微软雅黑</option>
+                    <option value="KaiTi">楷体</option>
+                </select>
+            </div>
+
+            <div class="style-group">
+                <label>文字颜色</label>
+                <input type="color" id="textColor" value="#000000">
+            </div>
+
+            <div class="style-group">
+                <label>背景颜色</label>
+                <input type="color" id="bgColor" value="#FFFFFF">
+            </div>
+
+            <div class="style-group">
+                <label>文字大小</label>
+                <div class="size-options">
+                    <button class="size-btn" data-size="small">小</button>
+                    <button class="size-btn active" data-size="medium">中</button>
+                    <button class="size-btn" data-size="large">大</button>
+                </div>
+            </div>
+
+            <div class="style-group">
+                <label>对齐方式</label>
+                <div class="align-options">
+                    <button class="align-btn" data-align="left">左对齐</button>
+                    <button class="align-btn active" data-align="center">居中</button>
+                    <button class="align-btn" data-align="right">右对齐</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <canvas id="previewCanvas"></canvas>
+        </div>
+
+        <div class="action-section">
+            <button id="generateBtn" class="primary-btn">生成图片</button>
+            <button id="downloadBtn" class="primary-btn" disabled>下载</button>
+        </div>
+    </div>
+
+    <script src="scripts/popup.js"></script>
+</body>
+</html>
