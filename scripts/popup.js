@@ -36,6 +36,8 @@ let currentStyle = {
     fontFamily: 'Microsoft YaHei',
     textColor: '#000000',
     bgColor: '#FFFFFF',
+    bgColor2: '#E0E0E0',
+    gradientDirection: 'to right',
     fontSize: 'medium',
     textAlign: 'center'
 };
@@ -50,22 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 调用DeepSeek R1 API进行文本总结
     async function summarizeText() {
-        const text = quoteText.value.trim();
-        if (!text) {
-            alert('请先输入需要总结的文字内容');
-            return;
-        }
-
         summarizeBtn.disabled = true;
         summarizeBtn.classList.add('loading');
 
         try {
+            // 获取当前活动标签页的内容
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            const pageContent = await chrome.tabs.sendMessage(tab.id, { action: 'getPageContent' });
+            
+            if (!pageContent || !pageContent.content) {
+                throw new Error('无法获取网页内容');
+            }
+
             const response = await fetch('http://localhost:3000/summarize', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ text })
+                body: JSON.stringify({ text: pageContent.content })
             });
 
             if (!response.ok) {
@@ -115,6 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('bgColor').addEventListener('input', (e) => {
         currentStyle.bgColor = e.target.value;
+    });
+
+    document.getElementById('bgColor2').addEventListener('input', (e) => {
+        currentStyle.bgColor2 = e.target.value;
+    });
+
+    document.getElementById('gradientDirection').addEventListener('change', (e) => {
+        currentStyle.gradientDirection = e.target.value;
     });
 
     // 字体大小按钮事件
@@ -170,8 +182,32 @@ function generateImage() {
     canvas.width = CANVAS_WIDTH;
     canvas.height = canvasHeight;
 
-    // 绘制背景
-    ctx.fillStyle = currentStyle.bgColor;
+    // 创建渐变背景
+    let gradient;
+    if (currentStyle.gradientDirection === 'circle') {
+        gradient = ctx.createRadialGradient(
+            CANVAS_WIDTH / 2, canvasHeight / 2, 0,
+            CANVAS_WIDTH / 2, canvasHeight / 2, Math.max(CANVAS_WIDTH, canvasHeight) / 2
+        );
+    } else {
+        const [direction, ...rest] = currentStyle.gradientDirection.split(' ');
+        const isHorizontal = rest.includes('right');
+        const isVertical = rest.includes('bottom');
+        
+        if (isHorizontal && isVertical) {
+            gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, canvasHeight);
+        } else if (isHorizontal) {
+            gradient = ctx.createLinearGradient(0, 0, CANVAS_WIDTH, 0);
+        } else {
+            gradient = ctx.createLinearGradient(0, 0, 0, canvasHeight);
+        }
+    }
+
+    gradient.addColorStop(0, currentStyle.bgColor);
+    gradient.addColorStop(1, currentStyle.bgColor2);
+
+    // 绘制渐变背景
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, CANVAS_WIDTH, canvasHeight);
 
     // 绘制文本

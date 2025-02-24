@@ -99,6 +99,30 @@ textarea:focus {
     border-color: #4a90e2;
 }
 
+.gradient-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.color-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.color-inputs input[type="color"] {
+    flex: 1;
+}
+
+#gradientDirection {
+    width: 100%;
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+}
+
 select,
 input[type="color"] {
     width: 100%;

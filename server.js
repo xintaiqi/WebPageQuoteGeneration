@@ -12,13 +12,16 @@ const API_URL = 'https://ark.cn-beijing.volces.com/api/v3/chat/completions';
 app.post('/summarize', async (req, res) => {
     try {
         const { text } = req.body;
-        
+        if (!text || text.trim().length === 0) {
+            return res.status(400).json({ error: '请提供要总结的文本内容' });
+        }
+
         const response = await axios.post(API_URL, {
             model: 'deepseek-v3-241226',
             messages: [
                 {
                     role: 'system',
-                    content: '使用一个金句总结全文最核心的内容'
+                    content: '使用一个金句总结全文最核心的内容，确保总结后的内容不超过200字。'
                 },
                 {
                     role: 'user',
@@ -26,7 +29,7 @@ app.post('/summarize', async (req, res) => {
                 }
             ],
             temperature: 0.6,
-            stream: true
+            stream: false
         }, {
             headers: {
                 'Content-Type': 'application/json',
@@ -35,7 +38,16 @@ app.post('/summarize', async (req, res) => {
             timeout: 60000
         });
 
-        res.json({ summary: response.data.choices[0].message.content });
+        if (!response.data || !response.data.choices || !response.data.choices[0]) {
+            throw new Error('API返回数据格式错误');
+        }
+
+        const summary = response.data.choices[0].message.content;
+        if (summary.length > 200) {
+            return res.status(400).json({ error: '生成的总结超过200字限制' });
+        }
+
+        res.json({ summary });
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: '生成总结时出错' });

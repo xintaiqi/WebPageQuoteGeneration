@@ -42,7 +42,18 @@
 
             <div class="style-group">
                 <label>背景颜色</label>
-                <input type="color" id="bgColor" value="#FFFFFF">
+                <div class="gradient-controls">
+                    <div class="color-inputs">
+                        <input type="color" id="bgColor" value="#FFFFFF">
+                        <input type="color" id="bgColor2" value="#E0E0E0">
+                    </div>
+                    <select id="gradientDirection">
+                        <option value="to right">从左到右</option>
+                        <option value="to bottom">从上到下</option>
+                        <option value="to bottom right">对角线</option>
+                        <option value="circle">径向渐变</option>
+                    </select>
+                </div>
             </div>
 
             <div class="style-group">
